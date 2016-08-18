@@ -1,19 +1,34 @@
 import random
 from ast import *
-
 import codegen
 
-variable = lambda name, number: Assign(targets=[Name(id=name, ctx=Store())],
-                                       value=Num(n=number))
 
-operations = lambda operation, number_one, number_two: \
-    Expr(value=BinOp(left=Num(n=number_one), op=operation, right=Num(number_two)))
+def term_res(result):
+    result_res = result
+    number_of_numbers = random.randint(2, 4)
+    print(number_of_numbers)
+    operations = ["+", "-", "*", "/"
+                                 ""]
+    term = []
+    result = 0
+    for i in range(number_of_numbers):
+        number = (random.randrange(-20, 20))
+        term.append(str(number))
+        function = random.choice(operations)
+        term.append(function)
 
-print_ast = lambda: Expr(
-    value=Call(func=Name(id='print', ctx=Load()), args=[Name(id='a', ctx=Load())], keywords=[], starargs=None,
-               kwargs=None))
+    term.pop(len(term) - 1)
+    # print(term, result)
+    term.insert(0, str(result))
+    term.insert(1, "-")
+    term = " ".join(term)
+    # print(term)
+    exec(str("result = " + term))
+    return term
 
-term_for_variable = lambda value, term: str(value) + " " + "=" + " " + term
+
+
+
 
 operations_ex = [Add(), Sub(), Mult(), Div()]
 
