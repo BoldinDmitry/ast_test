@@ -4,7 +4,9 @@ import codegen
 
 
 def term_res(result):
+    result_res = result
     number_of_numbers = random.randint(2, 4)
+    print(number_of_numbers)
     operations = ["+", "-", "*", "/"
                                  ""]
     term = []
@@ -16,9 +18,11 @@ def term_res(result):
         term.append(function)
 
     term.pop(len(term) - 1)
+    # print(term, result)
     term.insert(0, str(result))
     term.insert(1, "-")
     term = " ".join(term)
+    # print(term)
     exec(str("result = " + term))
     return term
 
