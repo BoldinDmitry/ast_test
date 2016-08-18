@@ -20,19 +20,17 @@ operations_ex = [Add(), Sub(), Mult(), Div()]
 i = int(input("Введите колличество строчек: \n"))
 new_code = ""
 old_code = ""
-
-
-
-for i in range(i):
+n = 0
+while n <= i:
     one_line = random.choice([variable("a", random.randint(-20, 20)),
-                             operations(random.choice(operations_ex), random.choice(["a", random.randint(-20, 20)]),
-                                        random.choice(["a", random.randint(-20, 20)]))])
+                              operations(random.choice(operations_ex), random.choice(["a", random.randint(-20, 20)]),
+                                         random.choice(["a", random.randint(-20, 20)]))])
     new_code += codegen.to_source(one_line) + '\n'
     try:
         exec(new_code)
         old_code = new_code
+        n += 1
     except:
-        i -= 1
         new_code = old_code
 
 print(new_code)
