@@ -39,4 +39,4 @@ def term_rand(all_variables=[]):
     return result
 
 
-print(term_rand())
+print(term_rand(["hui=1", "b=3"]))

@@ -71,7 +71,6 @@ def term_rand(all_variables=[]):
             term_for_print = term_str
             for i in range(0, len(all_variables) * 2, 2):
 
-                print(i)
                 if i != 0:  # Замена переменных их значениями в выражении
 
                     term[i] = all_variables[int(i / 2)].split("=")[1]
