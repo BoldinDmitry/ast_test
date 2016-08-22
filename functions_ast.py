@@ -49,7 +49,7 @@ def term_rand(all_variables=[]):
         number_of_numbers = random.randint(len(all_variables), 5)  # генерация числа колличества действий
 
     else:
-        number_of_numbers = random.randint(2, 5)  # генерация числа колличества действий
+        number_of_numbers = random.randint(1, 5)  # генерация числа колличества действий
     operations_for_generation = ["+", "-", "*", "/"]
     result = 1.0  # объявление переменной типа float
 
@@ -60,7 +60,8 @@ def term_rand(all_variables=[]):
                 term.append(all_variables[i].split("=")[0])  # Запись в term значение переменной(из all_variables)
 
             else:
-                term.append(str(random.randint(-5, 20)))  # Запись в term значение случайного числа
+                term.append(str(random.choice(
+                    [random.randint(1, 20), random.randint(-10, -1)])))  # Запись в term значение случайного числа
 
             function = random.choice(operations_for_generation)
             term.append(function)
@@ -94,11 +95,8 @@ def get_variables(code):
     :return: словарь {переменная: значение}(пример: {'a': '10', 'b': '0'})
     """
 
-
-
-    variables = {}
-    splited_code = code.split("\n")
-
+    variables = []
+    splited_code = str(code).split("\n")
     for i in range(len(splited_code)):
 
         if splited_code[i].find("=") != -1:
@@ -107,6 +105,6 @@ def get_variables(code):
             for n in range(len(splited_line)):
                 splited_line[n] = splited_line[n].strip()
 
-            variables.update({splited_line[0]: splited_line[1]})
+            variables.append(splited_line[0] + "=" + splited_line[1])
 
     return variables
