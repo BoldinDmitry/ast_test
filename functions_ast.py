@@ -85,3 +85,28 @@ def term_rand(all_variables=[]):
                 result = term_for_print
                 break  # Завершение цикла в случае не дробного result
     return result
+
+
+def get_variables(code):
+    """
+    Получение переменных из кода
+    :param code: код в формате string
+    :return: словарь {переменная: значение}(пример: {'a': '10', 'b': '0'})
+    """
+
+
+
+    variables = {}
+    splited_code = code.split("\n")
+
+    for i in range(len(splited_code)):
+
+        if splited_code[i].find("=") != -1:
+            splited_line = splited_code[i].split("=")
+
+            for n in range(len(splited_line)):
+                splited_line[n] = splited_line[n].strip()
+
+            variables.update({splited_line[0]: splited_line[1]})
+
+    return variables
