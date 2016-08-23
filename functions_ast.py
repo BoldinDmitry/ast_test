@@ -22,7 +22,6 @@ def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
     :return: объект AST c печатью строки, или строки, или числа
     """
 
-
     if variable_name:
         return Expr(
             value=Call(func=Name(id='print', ctx=Load()), args=[Name(id=variable_name, ctx=Load())],
@@ -40,10 +39,6 @@ def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
                        kwargs=None))
 
 
-# Функция генерации объявления переменных:
-# На вход: название переменной(value), число, или выражение для объявления переменной
-# Возвращает: код присваивания в формате string
-
 def term_for_variable(value, term):
     """
     :param value: название переменной
@@ -53,59 +48,57 @@ def term_for_variable(value, term):
     return parse(str(value) + " " + "=" + " " + str(term))
 
 
-# Функция генерации случайных выражений:
-# На вход: лист переменных типа int вида ["a=1", "b=3"](необязательно)
-# Возвращает: сгенерированное выражение
-
 def term_rand(all_variables=[]):
-    if all_variables:
-        number_of_numbers = random.randint(len(all_variables), 5)  # генерация числа колличества действий
+    """
 
-    else:
-        number_of_numbers = random.randint(1, 5)  # генерация числа колличества действий
+    :param all_variables: лист переменных типа str вида ["a=1", "b=3"](необязательно)
+    :return: сгенерированное выражение
+    """
+
+    while len(all_variables) >= 5:
+        all_variables.pop()
+
+    number_of_numbers = random.randint(len(all_variables), 5)
     operations_for_generation = ["+", "-", "*", "/"]
-    result = 1.0  # объявление переменной типа float
-
+    result = 1.0
     while True:
-        term = []  # переменная для хранения выражения
-        for i in range(number_of_numbers):  # наполнение term случайно сгенерированным выражением
+        term = []
+        for i in range(number_of_numbers):
             if len(all_variables) - 1 >= i:
-                term.append(all_variables[i].split("=")[0])  # Запись в term значение переменной(из all_variables)
+                term.append(all_variables[i].split("=")[0])
 
             else:
                 term.append(str(random.choice(
-                    [random.randint(1, 20), random.randint(-10, -1)])))  # Запись в term значение случайного числа
+                    [random.randint(1, 20), random.randint(-10, -1)])))
 
             function = random.choice(operations_for_generation)
             term.append(function)
         if term:
 
-            term.pop(len(term) - 1)  # удаление последнего элемента, так как он не число
+            term.pop(len(term) - 1)
             term_str = " ".join(term)
             term_for_print = term_str
             for i in range(0, len(all_variables) * 2, 2):
 
-                if i != 0:  # Замена переменных их значениями в выражении
+                if i != 0:
 
                     term[i] = all_variables[int(i / 2)].split("=")[1]
                 else:
-
-                    pass
+                    term[0] = all_variables[0].split("=")[1]
 
             term_str = " ".join(term)
             result = eval(term_str)
-
             if type(result) is not float and -100 < result < 100:
                 result = term_for_print
-                break  # Завершение цикла в случае не дробного result
+                break
     return result
 
 
 def get_variables(code):
     """
     Получение переменных из кода
-    :param code: код в формате string
-    :return: словарь {переменная: значение}(пример: {'a': '10', 'b': '0'})
+    :param code: код в формате str
+    :return: лист переменных типа str вида ["a=1", "b=3"]
     """
 
     variables = []
