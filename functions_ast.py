@@ -48,12 +48,14 @@ def term_for_variable(value, term):
     return parse(str(value) + " " + "=" + " " + str(term))
 
 
-def term_rand(all_variables=[]):
+def term_rand(all_variables=None):
     """
 
     :param all_variables: лист переменных типа str вида ["a=1", "b=3"](необязательно)
     :return: сгенерированное выражение
     """
+    if all_variables is None:
+        all_variables = []
 
     while len(all_variables) >= 5:
         all_variables.pop()
