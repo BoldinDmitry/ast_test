@@ -2,19 +2,27 @@ import random
 from ast import *
 
 
-# Присвоение переменной численное значение:
-# На вход: переменная(name) и значение переменной(number)
-# Возвращает: объект AST с объявлением переменной
-
 def variable(name, number):
+    """
+
+    :param name: название переменной
+    :param number: значение переменной
+    :return: объект AST с объявлением переменной
+    """
+
     return Assign(targets=[Name(id=name, ctx=Store())], value=Num(n=number))
 
 
-# Печать переменных, чисел и строк:
-# На вход: название переменной(variable_name), или строка(text_for_print), или число(number_for_print)
-# Возвращает: объект AST c печатью строки, или строки, или числа
-
 def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
+    """
+
+    :param variable_name: название переменной
+    :param string_for_print: название строки
+    :param number_for_print: число
+    :return: объект AST c печатью строки, или строки, или числа
+    """
+
+
     if variable_name:
         return Expr(
             value=Call(func=Name(id='print', ctx=Load()), args=[Name(id=variable_name, ctx=Load())],
@@ -37,6 +45,11 @@ def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
 # Возвращает: код присваивания в формате string
 
 def term_for_variable(value, term):
+    """
+    :param value: название переменной
+    :param term: число, или выражение для объявления переменной
+    :return: код присваивания
+    """
     return parse(str(value) + " " + "=" + " " + str(term))
 
 
@@ -77,7 +90,7 @@ def term_rand(all_variables=[]):
                     term[i] = all_variables[int(i / 2)].split("=")[1]
                 else:
 
-                    term[i] = all_variables[0].split("=")[1]
+                    pass
 
             term_str = " ".join(term)
             result = eval(term_str)
