@@ -57,10 +57,11 @@ def term_rand(all_variables=None):
     if all_variables is None:
         all_variables = []
 
-    while len(all_variables) >= 5:
+    while len(all_variables) >= 4:
         all_variables.pop()
 
-    number_of_numbers = random.randint(len(all_variables), 5)
+    number_of_numbers = random.randint(len(all_variables) + 1, 5)
+
     operations_for_generation = ["+", "-", "*", "/"]
     result = 1.0
     while True:
@@ -70,8 +71,7 @@ def term_rand(all_variables=None):
                 term.append(all_variables[i].split("=")[0])
 
             else:
-                term.append(str(random.choice(
-                    [random.randint(1, 20), random.randint(-10, -1)])))
+                term.append(str(random.randint(1, 20)))
 
             function = random.choice(operations_for_generation)
             term.append(function)
@@ -89,11 +89,14 @@ def term_rand(all_variables=None):
                     term[0] = all_variables[0].split("=")[1]
 
             term_str = " ".join(term)
-            result = eval(term_str)
+            try:
+                result = eval(term_str)
+            except:
+                pass
             if type(result) is not float and -100 < result < 100:
                 result = term_for_print
                 break
-    return result
+    return result, term_str
 
 
 def get_variables(code):
@@ -116,3 +119,17 @@ def get_variables(code):
             variables.append(splited_line[0] + "=" + splited_line[1])
 
     return variables
+
+
+def best_for_print(code):
+    """
+    :param code: код, который нужно проанализировать
+    :return: возвращает переменную, с которой производилось наибольшее колличество действи1
+    """
+    names_of_variables = []
+    lines_of_code = code.split("\n")
+    for i in range(len(lines_of_code)):
+        if "=" in lines_of_code[i]:
+            names_of_variables.append(lines_of_code[i].split("=")[0].replace(" ", ""))
+    if len(names_of_variables) > 0:
+        return max(set(names_of_variables), key=names_of_variables.count)
