@@ -19,7 +19,7 @@ def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
     :param variable_name: название переменной
     :param string_for_print: название строки
     :param number_for_print: число
-    :return: объект AST c печатью строки, или строки, или числа
+    :return: объект AST c печатью строки, или числа
     """
 
     if variable_name:
@@ -124,7 +124,7 @@ def get_variables(code):
 def best_for_print(code):
     """
     :param code: код, который нужно проанализировать
-    :return: возвращает переменную, с которой производилось наибольшее колличество действи1
+    :return: возвращает переменную, с которой производилось наибольшее колличество действий
     """
     names_of_variables = []
     lines_of_code = code.split("\n")

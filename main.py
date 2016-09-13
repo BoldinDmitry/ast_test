@@ -12,10 +12,10 @@ print_var - печать переменной
 types_play - изменение типов переменных
 """
 
-
 all_variables = []
 code = ""
 code_for_variables = ""
+
 
 def what_to_print():
     name_var_for_print = random.choice([all_variables])
@@ -45,24 +45,13 @@ def expression_generation(key, all_variables=None):
         expression_for_line, expression_var = term_rand(all_variables)
         line_gen(key, expression_for_line, expression_var)
 
-    if key == "types_play":
-        line_gen("str", all_variables)
-
 
 def code_analyze():
-    all_variables.extend(get_variables(code_for_variables))
-    lines_from_code = code.split("\n")
-
-    if len(lines_from_code) >= 5:
-        random.choice([expression_generation("types_play", all_variables),
-                       expression_generation("term_gen", all_variables)])
-
-    if len(lines_from_code) < 1:
-        expression_generation("create_var")
-
-    if 5 >= len(lines_from_code) >= 1 and len(all_variables) <= 3:
-        random.choice([expression_generation("create_var", all_variables),
-                       expression_generation("term_gen", all_variables)])
+    if len(code.split("\n")) >= 1:
+        random.choice([expression_generation("term_gen", all_variables),
+                       expression_generation("create_var", all_variables)])
+    else:
+        expression_generation("create_var", all_variables)
 
 
 def line_gen(key, expression=None, expression_var=None):
@@ -93,22 +82,10 @@ def line_gen(key, expression=None, expression_var=None):
         code += line_of_code + "\n"
 
 
-
-while len(code.split("\n")) <= 7:
-    code_analyze()
-
-code += "print(" + best_for_print(code) + ")"
-
-print(code)
-ant = input("Будет ли ошибка в коде?")
-try:
-    exec(code)
-    if ant == "не будет":
-        print("Всё правильно")
-    else:
-        print("ERROR")
-except:
-    if ant != "не будет":
-        print("Всё правильно")
-    else:
-        print("ERROR")
+def generation():
+    try:
+        while len(code.split("\n")) <= 4:
+            code_analyze()
+    except:
+        generation()
+    return code
