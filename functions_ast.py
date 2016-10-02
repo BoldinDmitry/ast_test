@@ -1,5 +1,8 @@
 import random
+import string
 from ast import *
+
+import sys
 
 
 def variable(name, number):
@@ -45,7 +48,7 @@ def term_for_variable(value, term):
     :param term: число, или выражение для объявления переменной
     :return: код присваивания
     """
-    return parse(str(value) + " " + "=" + " " + str(term))
+    return str(value) + " " + "=" + " " + str(term)
 
 
 def term_rand(all_variables=None):
@@ -57,10 +60,10 @@ def term_rand(all_variables=None):
     if all_variables is None:
         all_variables = []
 
-    while len(all_variables) >= 4:
+    while len(all_variables) >= 3:
         all_variables.pop()
 
-    number_of_numbers = random.randint(len(all_variables) + 1, 5)
+    number_of_numbers = random.randint(len(all_variables), 4)
 
     operations_for_generation = ["+", "-", "*", "/"]
     result = 1.0
@@ -96,7 +99,7 @@ def term_rand(all_variables=None):
             if type(result) is not float and -100 < result < 100:
                 result = term_for_print
                 break
-    return result, term_str
+    return term_for_variable(random.choice(string.ascii_lowercase), result) + "\n"
 
 
 def get_variables(code):
@@ -105,7 +108,7 @@ def get_variables(code):
     :param code: код в формате str
     :return: лист переменных типа str вида ["a=1", "b=3"]
     """
-
+    b = 0
     variables = []
     splited_code = str(code).split("\n")
     for i in range(len(splited_code)):
@@ -117,7 +120,25 @@ def get_variables(code):
                 splited_line[n] = splited_line[n].strip()
 
             variables.append(splited_line[0] + "=" + splited_line[1])
+    for i in range(len(variables)):
+        variables_splited = variables[i].split("=")
+        if "+" or "-" or "*" or "/" in variables_splited[1]:
+            try:
+                variables[i] = variables_splited[0] + "=" + str(eval(variables_splited[1]))
+            except:
+                variables_split = variables_splited[1].split(" ")
 
+                for k in range(len(variables_split)):
+
+                    if variables_split[k] in string.ascii_lowercase:
+
+                        for d in range(len(variables)):
+                            variables_ = variables[-d - 1].split("=")
+                            if variables_[0] == variables_split[k] and variables_[1] != variables_splited[1]:
+                                variables_split[k] = variables_[1]
+
+                variables_split = " ".join(variables_split)
+                variables[i] = variables_splited[0] + "=" + str(eval(variables_split))
     return variables
 
 

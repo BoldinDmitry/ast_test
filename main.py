@@ -82,9 +82,9 @@ def line_gen(key, expression=None, expression_var=None):
         code += line_of_code + "\n"
 
 
-def generation():
+def generation(code):
     try:
-        while len(code.split("\n")) <= 4:
+        while len(code.split("\n")) <= 2 :
             code_analyze()
     except:
         generation()
