@@ -5,43 +5,6 @@ from ast import *
 import sys
 
 
-def variable(name, number):
-    """
-
-    :param name: название переменной
-    :param number: значение переменной
-    :return: объект AST с объявлением переменной
-    """
-
-    return Assign(targets=[Name(id=name, ctx=Store())], value=Num(n=number))
-
-
-def print_ast(variable_name=None, string_for_print=None, number_for_print=None):
-    """
-
-    :param variable_name: название переменной
-    :param string_for_print: название строки
-    :param number_for_print: число
-    :return: объект AST c печатью строки, или числа
-    """
-
-    if variable_name:
-        return Expr(
-            value=Call(func=Name(id='print', ctx=Load()), args=[Name(id=variable_name, ctx=Load())],
-                       keywords=[],
-                       starargs=None, kwargs=None))
-
-    if number_for_print:
-        return Expr(
-            value=Call(func=Name(id='print', ctx=Load()), args=[Num(n=number_for_print)], keywords=[], starargs=None,
-                       kwargs=None))
-
-    if string_for_print:
-        return Expr(
-            value=Call(func=Name(id='print', ctx=Load()), args=[Str(s=string_for_print)], keywords=[], starargs=None,
-                       kwargs=None))
-
-
 def term_for_variable(value, term):
     """
     :param value: название переменной
@@ -99,6 +62,7 @@ def term_rand(all_variables=None):
             if type(result) is not float and -100 < result < 100:
                 result = term_for_print
                 break
+            break
     return term_for_variable(random.choice(string.ascii_lowercase), result) + "\n"
 
 
@@ -154,3 +118,8 @@ def best_for_print(code):
             names_of_variables.append(lines_of_code[i].split("=")[0].replace(" ", ""))
     if len(names_of_variables) > 0:
         return max(set(names_of_variables), key=names_of_variables.count)
+
+
+def print_in_code(code):
+    var_name = best_for_print(code)
+    return "print(" + str(var_name) + ")"

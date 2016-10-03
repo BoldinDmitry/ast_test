@@ -1,10 +1,5 @@
 from functions_ast import *
 
-code = """a = 1
-b = 5
-"""
-
-
 class Make_Task:
     """
     KEYS:
@@ -70,3 +65,9 @@ class Make_Task:
 
 make_task = Make_Task()
 print(make_task.make_error(random.choice(["name_error", "division_by_zero"]), code))
+
+
+class Task:
+    dict_tasks = {"if": 1, "while": 1, "for": 1, "math": 1}
+    def get_probability(self):
+        return random.choice(0, 1000) / 1000
