@@ -102,7 +102,7 @@ def get_variables(code):
                                 variables_split[k] = variables_[1]
 
                 variables_split = " ".join(variables_split)
-                variables[i] = variables_splited[0] + "=" + str(eval(variables_split))
+                variables[i] = variables_splited[0] + "=" + str(variables_split)
     return variables
 
 

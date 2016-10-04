@@ -1,5 +1,6 @@
 from functions_ast import *
 
+
 class Make_Task:
     """
     KEYS:
@@ -38,10 +39,11 @@ class Make_Task:
                 except Exception as e:
                     answers["right"] = str(e)
             else:
-                answers[i] = str(random.choice(["name '" + get_variables(code)[
-                    random.randint(0, len(get_variables(code))-1)].split("=")[0] + "' is not defined",
+                answers[i] = str(random.choice(["name '" + get_variables(__code)[
+                    random.randint(0, len(get_variables(__code)) - 1)].split("=")[0] + "' is not defined",
                                                 "division by zero", "syntax error"]))
-        print(answers)
+
+        return answers
 
     def name_error_answer(self, __code):
         pass
@@ -52,7 +54,7 @@ class Make_Task:
             "name_error": self.__name_error(__code)
         }[key]
         __code += error_type + "\n"
-        self.make_answer(key, __code)
+        print(self.make_answer(key, __code))
         return __code
 
     def make_answer(self, key, __code):
@@ -60,14 +62,11 @@ class Make_Task:
             "division_by_zero": self.division_by_zero_answer(__code),
             "name_error": self.name_error_answer(__code)
         }[key]
-        return __code
-
-
-make_task = Make_Task()
-print(make_task.make_error(random.choice(["name_error", "division_by_zero"]), code))
+        return answers
 
 
 class Task:
     dict_tasks = {"if": 1, "while": 1, "for": 1, "math": 1}
+
     def get_probability(self):
         return random.choice(0, 1000) / 1000

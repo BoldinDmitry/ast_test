@@ -42,8 +42,3 @@ class Genetic:
 
     def _get_probability(self, number_of_line, line_of_code):
         return random.randint(0, 100)
-
-
-code_generator = Code_generator()
-genetic = Genetic
-print(code_generator.main())
