@@ -42,3 +42,7 @@ class Genetic:
 
     def _get_probability(self, number_of_line, line_of_code):
         return random.randint(0, 100)
+
+code_gen = Code_generator
+
+print(Code_generator.random_line(code_gen, "a=10"))

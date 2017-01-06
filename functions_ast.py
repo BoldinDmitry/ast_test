@@ -14,19 +14,20 @@ def term_for_variable(value, term):
     return str(value) + " " + "=" + " " + str(term)
 
 
-def term_rand(all_variables=None):
+def term_rand(all_variables=None, without_var=False):
     """
 
+    :param without_var: возвращать простое выражение(true), по умолчанию возвращать присвоение пременной
     :param all_variables: лист переменных типа str вида ["a=1", "b=3"](необязательно)
     :return: сгенерированное выражение
     """
     if all_variables is None:
         all_variables = []
 
-    while len(all_variables) >= 3:
+    while len(all_variables) >= 2:
         all_variables.pop()
 
-    number_of_numbers = random.randint(len(all_variables), 4)
+    number_of_numbers = random.randint(len(all_variables) + 1, 4)
 
     operations_for_generation = ["+", "-", "*", "/"]
     result = 1.0
@@ -35,7 +36,6 @@ def term_rand(all_variables=None):
         for i in range(number_of_numbers):
             if len(all_variables) - 1 >= i:
                 term.append(all_variables[i].split("=")[0])
-
             else:
                 term.append(str(random.randint(1, 20)))
 
@@ -52,6 +52,7 @@ def term_rand(all_variables=None):
 
                     term[i] = all_variables[int(i / 2)].split("=")[1]
                 else:
+
                     term[0] = all_variables[0].split("=")[1]
 
             term_str = " ".join(term)
@@ -63,7 +64,10 @@ def term_rand(all_variables=None):
                 result = term_for_print
                 break
             break
-    return term_for_variable(random.choice(string.ascii_lowercase), result) + "\n"
+    if without_var:
+        return result
+    else:
+        return term_for_variable(random.choice(string.ascii_lowercase), result) + "\n"
 
 
 def get_variables(code):
@@ -123,3 +127,4 @@ def best_for_print(code):
 def print_in_code(code):
     var_name = best_for_print(code)
     return "print(" + str(var_name) + ")"
+

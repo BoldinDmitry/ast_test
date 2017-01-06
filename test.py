@@ -70,3 +70,5 @@ class Task:
 
     def get_probability(self):
         return random.choice(0, 1000) / 1000
+
+task = Make_Task
