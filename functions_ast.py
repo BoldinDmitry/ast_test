@@ -3,6 +3,41 @@ import string
 import ast
 import codegen
 
+def add_for(arguments_score=None):
+    """
+    Добавить цикл for в код
+    :param arguments_score: колличество аргументов в for
+    :return: возвращает строку для кода с циклом for
+    """
+    if arguments_score is None:
+        arguments_score = random.randint(1, 3)
+
+    if arguments_score == 1:
+        print(1)
+        for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
+                          iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
+                                        args=[ast.Num(n=random.randint(0, 100))], keywords=[], starargs=None,
+                                        kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
+
+    elif arguments_score == 2:
+        st_arg = random.randint(0, 50)
+        scnd_arg = random.randint(51, 100)
+        for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
+                          iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
+                                        args=[ast.Num(n=st_arg), ast.Num(n=scnd_arg)],
+                                        keywords=[], starargs=None, kwargs=None), body=[], keywords=[], starargs=None,
+                          kwargs=None, orelse=[])
+    elif arguments_score == 3:
+        for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
+                          iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
+                                        args=[ast.Num(n=random.randint(0, 50)), ast.Num(n=random.randint(51, 100)),
+                                             ast.Num(n=random.randint(0, 30))], keywords=[], starargs=None,
+                                        kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
+    else:
+        return "Error"
+
+    return codegen.to_source(for_ast)
+
 
 def list_generator(__code):
     """
