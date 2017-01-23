@@ -251,4 +251,3 @@ def best_for_print(code):
 def print_in_code(__code):
     var_name = best_for_print(__code)
     return "print(" + str(var_name) + ")"
-
