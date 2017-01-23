@@ -9,10 +9,23 @@ def parse_print(__code, line_num=None):
 
 
 code = """
+a = 1
 for i in range(10):
-    print(1)"""
+    print(1)
+if a == 2/2:
+    print(a)"""
 
-parse_print(code, 0)
 
-
+def branching_line(__code, adding_line_str):
+    """
+    добавление строки в тело циклов/ветвлений
+    :param __code: код, куда нужно добавить строку
+    :param adding_line_str: строка, которую нужно добавить
+    :return:
+    """
+    __code = ast.parse(__code)
+    for i in range(len(__code.body)):
+        if type(__code.body[i]) in [ast.For, ast.If, ast.While]:
+            __code.body[i].body.append(ast.parse(adding_line_str))
+            return codegen.to_source(__code)
 

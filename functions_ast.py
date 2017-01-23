@@ -3,6 +3,21 @@ import string
 import ast
 import codegen
 
+
+def branching_line(__code, adding_line_str):
+    """
+    добавление строки в тело циклов/ветвлений
+    :param __code: код, куда нужно добавить строку
+    :param adding_line_str: строка, которую нужно добавить
+    :return:
+    """
+    __code = ast.parse(__code)
+    for i in range(len(__code.body)):
+        if type(__code.body[i]) in [ast.For, ast.If, ast.While]:
+            __code.body[i].body.append(ast.parse(adding_line_str))
+            return codegen.to_source(__code)
+
+
 def add_for(arguments_score=None):
     """
     Добавить цикл for в код
@@ -31,7 +46,7 @@ def add_for(arguments_score=None):
         for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
                           iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
                                         args=[ast.Num(n=random.randint(0, 50)), ast.Num(n=random.randint(51, 100)),
-                                             ast.Num(n=random.randint(0, 30))], keywords=[], starargs=None,
+                                              ast.Num(n=random.randint(0, 30))], keywords=[], starargs=None,
                                         kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
     else:
         return "Error"
