@@ -15,12 +15,13 @@ def branching_line(__code, adding_line_str):
     for i in range(len(__code.body)):
         if type(__code.body[i]) in [ast.For, ast.If, ast.While]:
             __code.body[i].body.append(ast.parse(adding_line_str))
-            return codegen.to_source(__code)
+            return codegen.to_source(__code) + '\n'
 
 
-def add_for(arguments_score=None):
+def add_for(__code, arguments_score=None):
     """
     Добавить цикл for в код
+    :param __code: код, для которого нужно сгенерировать for
     :param arguments_score: колличество аргументов в for
     :return: возвращает строку для кода с циклом for
     """
@@ -28,7 +29,6 @@ def add_for(arguments_score=None):
         arguments_score = random.randint(1, 3)
 
     if arguments_score == 1:
-        print(1)
         for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
                           iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
                                         args=[ast.Num(n=random.randint(0, 100))], keywords=[], starargs=None,
@@ -50,8 +50,8 @@ def add_for(arguments_score=None):
                                         kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
     else:
         return "Error"
-
-    return codegen.to_source(for_ast)
+    for_ast.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
+    return codegen.to_source(for_ast) + '\n'
 
 
 def list_generator(__code):
@@ -66,11 +66,11 @@ def list_generator(__code):
     if variables:
         for d in range(list_len):
             num_for_list = random.choice([variables[random.randint(0, len(variables) - 1)],
-                                          random.randint(-100, 100), term_rand(get_variables(code))])
+                                          random.randint(-100, 100), term_rand(get_variables(__code))])
             for_return.append(num_for_list)
     else:
         for k in range(list_len):
-            num_for_list = random.choice(random.randint(-100, 100), term_rand(get_variables(code)))
+            num_for_list = random.choice(random.randint(-100, 100), term_rand(get_variables(__code)))
             for_return.append(num_for_list)
     for_return = list(set(for_return))
     if for_return and for_return is not None:
@@ -90,7 +90,7 @@ def add_list(__code):
     list_ast.value = ast.List(elts=[ast.parse(str(list_nums[0])).body[0].value])
     for i in range(1, len(list_nums) - 1):
         list_ast.value.elts.append(ast.parse(str(list_nums[i])).body[0].value)
-    return codegen.to_source(list_ast)
+    return codegen.to_source(list_ast) + '\n'
 
 
 def for_all_vars(line):
@@ -119,7 +119,7 @@ def get_variables(__code, get_variables_names=False):
     """
     variables_names = []
     for_return = []
-    code_ast = ast.parse(__code)
+    code_ast = ast.parse(str(__code))
     code_len = len(code_ast.body)
     for i in range(code_len):
         line = code_ast.body[i]
@@ -130,7 +130,7 @@ def get_variables(__code, get_variables_names=False):
             else:
                 variables_names += for_all_vars(line)
 
-        if type(line) == ast.If:
+        if type(line) in [ast.If, ast.For, ast.While]:
             for d in range(len(line.body)):
                 line_in_if = line.body[d]
                 variables_names += for_all_vars(line_in_if)
@@ -141,7 +141,10 @@ def get_variables(__code, get_variables_names=False):
             return "Error"
 
         for i in range(len(variables_names)):
-            for_return.append(variables_names[i] + "=" + str(locals()[variables_names[i]]))
+            try:
+                for_return.append(variables_names[i] + "=" + str(locals()[variables_names[i]]))
+            except KeyError:
+                pass
         return list(set(for_return))
     else:
         return variables_names
@@ -149,9 +152,11 @@ def get_variables(__code, get_variables_names=False):
 
 def random_for_logical_term(variables, code):
     random_var = random.choice(variables)
+
     if type(random_var) == str:
         random_var = random_var.split("=")[0]
-    random_term = term_rand(variables, True)
+
+    random_term = term_rand(variables)
 
     if type(random_term) == float:
         random_term = int(random_term)
@@ -161,40 +166,29 @@ def random_for_logical_term(variables, code):
 
 def logical_term(__code, term_count=None):
     """
-
     :param __code: код той программы, для которой нужно сгенерировать выражение
     :param term_count: необязательный параметр, генерация определнного колличества членов логического выражения
     :return: логическое выражение для переданного кода
     """
     term_operators = [" < ", " > ", " == ", " != "]
     logical_operators = [" or ", " and "]
-    variables = get_variables(__code)
-
+    vars_for_term = get_variables(__code)
     if term_count is None:
         term_count = random.randint(1, 3)
-
-    if len(variables) > term_count * 2:
-        variables = variables[0: term_count * 2]
-
-    elif not variables or len(variables) < term_count * 2:
-        for d in range(term_count * 2):
-            variables.append(str(random.randint(-100, 100)))
     terms = []
-
     for d in range(term_count):
-        term = str(random_for_logical_term(variables, __code)) + str(random.choice(term_operators)) + \
-               str(random_for_logical_term(variables, __code))
+        term = random.choice([random.choice(vars_for_term).split("=")[0], term_rand(vars_for_term, True)]) + \
+               str(random.choice(term_operators)) + \
+               random.choice([random.choice(vars_for_term).split("=")[0], term_rand(vars_for_term, True)])
         if term not in terms:
             terms.append(term)
-
     for_return = ""
     terms = list(set(terms))
-
-    for d in range(len(terms)):
-        for_return += terms[d] + random.choice(logical_operators)
-        if d + 1 == len(terms):
-            for_return += terms[d]
-    return for_return
+    for i in range(len(terms)):
+        if i == len(terms) - 1:
+            for_return += terms[i]
+            return for_return
+        for_return += terms[i] + random.choice(logical_operators)
 
 
 def add_if(__code):
@@ -203,10 +197,13 @@ def add_if(__code):
     :param __code: код, куда надо добавить if
     :return: возвращает if с сгенерированным выражением
     """
-    ast_of_if = ast.If(test=ast.parse(logical_term(__code)).body[0].value,
+    __code = str(__code)
+    term_for_if = logical_term(__code)
+    ast_of_if = ast.If(test=ast.parse(term_for_if).body[0].value,
                        body=[], orelse=[])
+    ast_of_if.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
 
-    return codegen.to_source(ast_of_if)
+    return codegen.to_source(ast_of_if) + '\n'
 
 
 def add_while(__code):
@@ -215,9 +212,11 @@ def add_while(__code):
     :param __code: код, куда нужно добавить while
     :return: возвращает while с сгенерированным выражением
     """
-    ast_while = ast.While(test=ast.parse(logical_term(__code)).body[0].value,
+    log_term = logical_term(str(__code))
+    ast_while = ast.While(test=ast.parse(log_term).body[0].value,
                           body=[], orelse=[])
-    return codegen.to_source(ast_while)
+    ast_while.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
+    return codegen.to_source(ast_while) + '\n'
 
 
 def term_for_variable(value, term):
@@ -242,7 +241,6 @@ def term_rand(all_variables=None, without_var=False):
         all_variables.pop()
 
     number_of_numbers = random.randint(len(all_variables) + 1, 4)
-
     operations_for_generation = ["+", "-", "*", "/"]
     result = 1.0
     while True:
@@ -266,7 +264,6 @@ def term_rand(all_variables=None, without_var=False):
 
                     term[i] = all_variables[int(i / 2)].split("=")[1]
                 else:
-
                     term[0] = all_variables[0].split("=")[1]
 
             term_str = " ".join(term)
@@ -277,7 +274,7 @@ def term_rand(all_variables=None, without_var=False):
             if type(result) is not float and -100 < result < 100:
                 result = term_for_print
                 break
-            break
+
     if without_var:
         return result
     else:
@@ -289,15 +286,15 @@ def best_for_print(code):
     :param code: код, который нужно проанализировать
     :return: возвращает переменную, с которой производилось наибольшее колличество действий
     """
-    names_of_variables = []
-    lines_of_code = code.split("\n")
-    for i in range(len(lines_of_code)):
-        if "=" in lines_of_code[i]:
-            names_of_variables.append(lines_of_code[i].split("=")[0].replace(" ", ""))
-    if len(names_of_variables) > 0:
-        return max(set(names_of_variables), key=names_of_variables.count)
+    names_of_variables = get_variables(code, True)
+
+    if names_of_variables:
+        name = max(set(names_of_variables), key=names_of_variables.count)
+        return name
+    else:
+        return term_rand(get_variables(code), True)
 
 
 def print_in_code(__code):
     var_name = best_for_print(__code)
-    return "print(" + str(var_name) + ")"
+    return "print(" + str(var_name) + ")\n"

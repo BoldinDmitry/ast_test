@@ -8,24 +8,12 @@ def parse_print(__code, line_num=None):
         print(ast.dump(ast.parse(__code)))
 
 
-code = """
-a = 1
-for i in range(10):
-    print(1)
-if a == 2/2:
-    print(a)"""
+lines_count = 10
+code = ""
+code += term_rand()
+all_functions = [add_if(code), term_rand(get_variables(code), False), add_while(code), add_for(code)]
 
-
-def branching_line(__code, adding_line_str):
-    """
-    добавление строки в тело циклов/ветвлений
-    :param __code: код, куда нужно добавить строку
-    :param adding_line_str: строка, которую нужно добавить
-    :return:
-    """
-    __code = ast.parse(__code)
-    for i in range(len(__code.body)):
-        if type(__code.body[i]) in [ast.For, ast.If, ast.While]:
-            __code.body[i].body.append(ast.parse(adding_line_str))
-            return codegen.to_source(__code)
-
+for i in range(5):
+    code += random.choice(all_functions)
+code += print_in_code(code)
+print(code)
