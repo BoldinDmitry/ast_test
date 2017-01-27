@@ -1,23 +1,32 @@
 from functions_ast import *
 
 
-class Code_generator:
-    def main(self):
+class CodeGenerator:
+    def main(self, __code=""):
         __genetic = Genetic
         code_list = []
-        code = ""
+        __best_code = []
         for k in range(5):
-            for i in range(100):
+            for i in range(10):
+                print(">>>" + str(k) + " " + str(i))
                 __line_of_code = ""
-                __line_of_code += self.random_line(__line_of_code) + "\n"
-                code_list.append(__line_of_code)
-            __best_code = __genetic.main(__genetic, code_list)
-            code += __best_code
-        return code
+                if __line_of_code != "Error":
+                    __code += __line_of_code
+                    code_list.append(__code)
+            __best_code.append(__genetic.main(__genetic, code_list))
+
+        return random.choice(__best_code)
 
     def random_line(self, __code):
-        all_functions = ["a = 1 + 4 * 2", print_in_code(__code)]  # массив из функций
+        if __code == "":
+            return term_rand()
+        variables = get_variables(__code)
+        if variables == "Error":
+            return variables
+        all_functions = [term_rand(variables), print_in_code(__code),
+                         add_if(__code), add_for(__code), add_while(__code)]  # массив из функций
         line_of_code = random.choice(all_functions)
+        print(line_of_code)
         return line_of_code
 
 
@@ -43,6 +52,8 @@ class Genetic:
     def _get_probability(self, number_of_line, line_of_code):
         return random.randint(0, 100)
 
-code_gen = Code_generator
 
-print(Code_generator.random_line(code_gen, "a=10"))
+code_gen = CodeGenerator
+
+print(code_gen.main(code_gen))
+

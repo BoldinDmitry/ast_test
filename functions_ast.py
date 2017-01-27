@@ -1,7 +1,13 @@
 import random
 import string
 import ast
+from _socket import timeout
+
 import codegen
+from functools import wraps
+import errno
+import os
+import signal
 
 
 def branching_line(__code, adding_line_str):
@@ -31,12 +37,12 @@ def add_for(__code, arguments_score=None):
     if arguments_score == 1:
         for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
                           iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
-                                        args=[ast.Num(n=random.randint(0, 100))], keywords=[], starargs=None,
+                                        args=[ast.Num(n=random.randint(0, 20))], keywords=[], starargs=None,
                                         kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
 
     elif arguments_score == 2:
-        st_arg = random.randint(0, 50)
-        scnd_arg = random.randint(51, 100)
+        st_arg = random.randint(0, 25)
+        scnd_arg = random.randint(25, 50)
         for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
                           iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
                                         args=[ast.Num(n=st_arg), ast.Num(n=scnd_arg)],
@@ -45,11 +51,14 @@ def add_for(__code, arguments_score=None):
     elif arguments_score == 3:
         for_ast = ast.For(target=ast.Name(id=random.choice(string.ascii_lowercase), ctx=ast.Store()),
                           iter=ast.Call(func=ast.Name(id='range', ctx=ast.Load()),
-                                        args=[ast.Num(n=random.randint(0, 50)), ast.Num(n=random.randint(51, 100)),
-                                              ast.Num(n=random.randint(0, 30))], keywords=[], starargs=None,
+                                        args=[ast.Num(n=random.randint(0, 25)), ast.Num(n=random.randint(25, 50)),
+                                              ast.Num(n=random.randint(1, 5))], keywords=[], starargs=None,
                                         kwargs=None), body=[], keywords=[], starargs=None, kwargs=None, orelse=[])
     else:
         return "Error"
+    variables = get_variables(__code)
+    if variables == "Error":
+        return variables
     for_ast.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
     return codegen.to_source(for_ast) + '\n'
 
@@ -61,6 +70,8 @@ def list_generator(__code):
     :return:
     """
     variables = get_variables(__code, True)
+    if variables == "Error":
+        return variables
     list_len = random.randint(1, 10)
     for_return = []
     if variables:
@@ -93,9 +104,12 @@ def add_list(__code):
     return codegen.to_source(list_ast) + '\n'
 
 
+def signal_handler(signum, frame):
+    raise Exception("Timed out!")
+
+
 def for_all_vars(line):
     """
-
     :param line: строка из которой нужно получить имя перменной
     :return: возвращает имя перменной из строки
     """
@@ -112,7 +126,6 @@ def for_all_vars(line):
 
 def get_variables(__code, get_variables_names=False):
     """
-
     :param get_variables_names: Флаг, указывающий на то, что нужно вернуть только имена перменных
     :param __code: код программы, откуда нужно получить перменные
     :return: возвращает все перменные из кода
@@ -135,6 +148,8 @@ def get_variables(__code, get_variables_names=False):
                 line_in_if = line.body[d]
                 variables_names += for_all_vars(line_in_if)
     if get_variables_names is False:
+        signal.signal(signal.SIGALRM, signal_handler)
+        signal.alarm(1)
         try:
             exec(__code)
         except:
@@ -173,6 +188,8 @@ def logical_term(__code, term_count=None):
     term_operators = [" < ", " > ", " == ", " != "]
     logical_operators = [" or ", " and "]
     vars_for_term = get_variables(__code)
+    if vars_for_term == "Error":
+        return vars_for_term
     if term_count is None:
         term_count = random.randint(1, 3)
     terms = []
@@ -199,6 +216,8 @@ def add_if(__code):
     """
     __code = str(__code)
     term_for_if = logical_term(__code)
+    if term_for_if == "Error":
+        return term_for_if
     ast_of_if = ast.If(test=ast.parse(term_for_if).body[0].value,
                        body=[], orelse=[])
     ast_of_if.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
@@ -213,6 +232,8 @@ def add_while(__code):
     :return: возвращает while с сгенерированным выражением
     """
     log_term = logical_term(str(__code))
+    if log_term == "Error":
+        return log_term
     ast_while = ast.While(test=ast.parse(log_term).body[0].value,
                           body=[], orelse=[])
     ast_while.body.append(ast.parse(random.choice([term_rand(get_variables(__code))])))
@@ -235,6 +256,8 @@ def term_rand(all_variables=None, without_var=False):
     :param all_variables: лист переменных типа str вида ["a=1", "b=3"](необязательно)
     :return: сгенерированное выражение
     """
+    if all_variables == "Error":
+        return all_variables
     if all_variables is None:
         all_variables = []
     while len(all_variables) >= 2:
@@ -297,4 +320,7 @@ def best_for_print(code):
 
 def print_in_code(__code):
     var_name = best_for_print(__code)
+    if var_name == "Error":
+        return var_name
     return "print(" + str(var_name) + ")\n"
+
